@@ -1,0 +1,144 @@
+define
+
+processing_date sub attribute,
+    value datetime;
+
+payment_date sub attribute,
+    value datetime;
+
+invoice_id sub attribute,
+    value long;
+    
+creation_date sub attribute,
+    value datetime;
+    
+invoice sub entity,
+    owns processing_date,
+    owns payment_date,
+    owns invoice_id,
+    owns creation_date,
+    plays invoicing:issued_invoice;
+    
+supplier_id sub attribute,
+    value long;
+    
+name sub attribute,
+    value string;
+    
+supplier sub entity, 
+    owns supplier_id,
+    owns name,
+    plays order_supply:order_supplier;
+    
+purchase_request sub entity,
+    owns creation_date,
+    plays request_approval:approved_request,
+    plays request_membership:parent_request;
+    
+person sub entity,
+    owns name,
+    plays request_approval:request_approver;
+    
+approval_date sub attribute,
+    value datetime;
+    
+request_approval sub relation,
+    owns approval_date,
+    relates request_approver,
+    relates approved_request;
+    
+order_id sub attribute,
+    value long;
+    
+receipt_date sub attribute,
+    value datetime;
+    
+purchase_order sub entity,
+    owns order_id,
+    owns receipt_date,
+    owns creation_date,
+    plays invoicing:invoiced_purchase,
+    plays request_membership:member_order,
+    plays order_supply:supplied_order,
+    plays order_line:parent_order,
+    plays order_pricing:order;
+    
+invoicing sub relation,
+    relates issued_invoice,
+    relates invoiced_purchase;
+
+request_membership sub relation,
+    relates parent_request,
+    relates member_order;
+    
+order_supply sub relation,
+    relates order_supplier,
+    relates supplied_order;
+    
+quantity sub attribute,
+    value long;
+    
+item_id sub attribute,
+    value long;
+    
+description sub attribute,
+    value string;
+    
+item sub entity,
+    owns item_id,
+    owns description,
+    plays order_line:line_item,
+    plays item_pricing_sub:item,
+    plays item_pricing_direct:item,
+    plays item_pricing_own:item,
+    plays item_pricing_entity:item;
+    
+order_line sub relation,
+    owns quantity,
+    relates parent_order,
+    relates line_item,
+    plays line_pricing:line;
+    
+###### TEST #######
+
+price sub attribute,
+    value long,
+    plays pricing:price,
+    plays item_pricing_direct:price;
+    
+currency sub attribute,
+    value string,
+    plays pricing:currency,
+    plays item_pricing_direct:currency;
+    
+pricing sub relation,
+    relates price,
+    relates currency;
+    
+order_pricing sub pricing,
+    relates order;
+    
+line_pricing sub pricing,
+    relates line;
+    
+item_pricing_sub sub pricing,
+    relates item;
+    
+price_entity sub entity,
+    owns price,
+    owns currency,
+    plays item_pricing_entity:price_entity;
+    
+item_pricing_direct sub relation,
+    relates price,
+    relates currency,
+    relates item;
+    
+item_pricing_own sub relation,
+    owns price,
+    owns currency,
+    relates item;
+    
+item_pricing_entity sub relation,
+    relates price_entity,
+    relates item;
